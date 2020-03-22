@@ -1,50 +1,39 @@
 module.exports = function solveSudoku(matrix) {
 
-  let blockers = {}; // if matching noumber is founded add it to the object
-  let takenNumbers;
-  let zeros = 1;
+    mySolver(matrix);
+    console.log(matrix);
 
-  while (zeros > 0) {
-    zeros = 0;
-
-    for (let vertical = 0; vertical < matrix.length; vertical++) {
-      for (let horizontal = 0; horizontal < matrix.length; horizontal++) {
-        if (matrix[vertical][horizontal] === 0) { // do sth if 0 is founded
-
-          blockers = {}; // reset for each time   
-          for (let number = 0; number < 9; number++) { // in a row
-            if (matrix[vertical][number] > 0) {
-              blockers[matrix[vertical][number]] = true;
+    function isValid(matrix, horizontal, vertical, number) {
+        for (let i = 0; i < matrix.length; i++) {
+            const horizontalBox = 3 * Math.floor(horizontal / 3) + Math.floor(i / 3);
+            const verticalBox = 3 * Math.floor(vertical / 3) + i % 3;
+            if (matrix[horizontal][i] == number || matrix[i][vertical] == number || matrix[horizontalBox][verticalBox] == number) {
+                return false; 
             }
-            if (matrix[number][horizontal] > 0) { // in a column
-              blockers[matrix[number][horizontal]] = true;
-            }
-          }
-          for (let verticalBox = Math.floor(vertical / 3) * 3; verticalBox < Math.floor(vertical / 3) * 3 + 3; verticalBox++) { // in a box; Math.floor(vertical/3)*3 - seting the initial vertical id of box
-            for (let horizontalBox = Math.floor(horizontal / 3) * 3; horizontalBox < Math.floor(horizontal / 3) * 3 + 3; horizontalBox++) {
-              if (matrix[verticalBox][horizontalBox] > 0) {
-                blockers[matrix[verticalBox][horizontalBox]] = true;
-              }
-            }
-          }
-          takenNumbers = Object.keys(blockers);
-          if (takenNumbers.length === 8) { // filling the cell with only one possibility
-            for (let possibility = 1; possibility <= 9; possibility++) {
-              if (takenNumbers.indexOf(String(possibility)) < 0) {
-                matrix[vertical][horizontal] = possibility;
-              }
-            }
-          } else { // increment the counter of nonobvious zeros
-            zeros++;
-          }
         }
-      }
-
+        return true;
     }
 
-  }
 
-
-
-  return matrix
+    function mySolver(matrix) {
+        for (let horizontal = 0; horizontal < 9; horizontal++) {
+            for (let vertical = 0; vertical < 9; vertical++) {
+                if (matrix[horizontal][vertical] == 0) {
+                    for (let number = 1; number <= 9; number++) {
+                        if (isValid(matrix, horizontal, vertical, number)) {
+                            matrix[horizontal][vertical] = number;
+                            if (mySolver(matrix)) {
+                                return true;
+                            } else {
+                                matrix[horizontal][vertical] = 0;
+                            }
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+        return matrix
 }
